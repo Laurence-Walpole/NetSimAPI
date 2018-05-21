@@ -11,7 +11,7 @@ public class Main {
     public static void main(String[] args){
         List<Component> componentList = new ArrayList<>();
         MAC m = new MAC("");
-        NIC t = new NIC(m, 100, false, componentList);
+        NIC t = new NIC(m, 2,100, false, componentList);
         componentList.add(t);
         Cable c = new Cable(Ethernet.IEE802_3AE, "Black", 5, false, componentList);
         System.out.println(c);

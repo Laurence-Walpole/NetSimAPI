@@ -1,9 +1,9 @@
 package OSI.Physical;
 
+import Standards.IPv4;
+import Standards.IPv6;
 import Standards.MAC;
-
 import java.util.List;
-
 /**
  * This class is used to describe a Network Interface Card component in the network.
  * It inherits attributes from the Component class.
@@ -15,6 +15,8 @@ import java.util.List;
 public class NIC extends Component{
     private MAC macAddress;
     private int maxConnections;
+    private IPv4 iPv4;
+    private IPv6 iPv6;
 
     /**
      * Defines the piece of cable used to connect two NICs.
@@ -46,7 +48,9 @@ public class NIC extends Component{
     public int getMaxConnections() {
         return maxConnections;
     }
-
+    /**
+     * @return String Returns a formatted display of the NICs basic information.
+     */
     @Override
     public String toString(){
         return String.format("[MAC]: %s, [Ports]: %d, [Port Speed]: %dMB/s, [Active]: %s, [Connection Count]: %d",

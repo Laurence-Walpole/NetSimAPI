@@ -1,7 +1,6 @@
 package OSI.Physical;
 
 import Standards.Ethernet;
-
 import java.util.List;
 /**
  * This class is used to describe a cable component in the network.
