@@ -54,4 +54,16 @@ public class MAC {
         }
         return sb.toString();
     }
+
+    public String toString() {
+        return address;
+    }
+
+    public boolean equals(Object other) {
+        return (other instanceof MAC) ? (((MAC) other).getMACAddress().equals(getMACAddress())) : false;
+    }
+
+    public int hashCode() {
+        return getMACAddress().hashCode();
+    }
 }

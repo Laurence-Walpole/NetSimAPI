@@ -37,10 +37,10 @@ public class NIC extends Component{
         this.maxConnections = maxConnections;
     }
     /**
-     * @return String This returns the MAC address of the NIC.
+     * @return MAC This returns the MAC address of the NIC.
      */
-    public String getMacAddress() {
-        return macAddress.getMACAddress();
+    public MAC getMacAddress() {
+        return macAddress;
     }
     /**
      * @return String This returns the maximum connections of the NIC.
