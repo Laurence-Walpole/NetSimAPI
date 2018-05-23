@@ -48,6 +48,14 @@ public class NIC extends Component{
     public int getMaxConnections() {
         return maxConnections;
     }
+
+    /**
+     * @return IPv4 This returns the IPv4 Address of the NIC.
+     */
+    public IPv4 getIPv4() { return iPv4;}
+
+    public IPv6 getIPv6() { return iPv6; }
+
     /**
      * @return String Returns a formatted display of the NICs basic information.
      */

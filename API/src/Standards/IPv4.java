@@ -30,4 +30,12 @@ public class IPv4 {
 
         ipAddresses.put(type, new IP("127.0.0.1"));
     }
+
+    public boolean equals(Object other) {
+        return (other instanceof IPv4) ? (((IPv4) other).getIPAddress(IPType.NORMAL).getAddress().equals(getIPAddress(IPType.NORMAL).getAddress())) : false;
+    }
+
+    public int hashCode() {
+        return getIPAddress(IPType.NORMAL).getAddress().hashCode();
+    }
 }

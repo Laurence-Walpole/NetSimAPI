@@ -2,7 +2,8 @@ package OSI;
 
 import OSI.Physical.Component;
 import OSI.Physical.NIC;
-import Standards.MAC;
+import Standards.IPType;
+import Standards.IPv4;
 
 import java.util.*;
 
@@ -14,31 +15,31 @@ import java.util.*;
  * @since 2018-05-22
  */
 public class Routing {
-    private Map<MAC, List<NIC>> routingMap = new HashMap<MAC, List<NIC>>();
+    private Map<IPv4, List<NIC>> routingMap = new HashMap<>();
 
     /**
-     * Finds a list of MACs that must be traversed to connect from network interface to destination
+     * Finds a list of IPs that must be traversed to connect from network interface to destination
      * @param networkInterface The NIC that is the source of the query
-     * @param destinationMAC The destination MAC address.
-     * @param visitedMACs A set of previously visited MAC addresses
-     * @return List<MAC> The MAC addresses of the NICs that must be hopped to arrive at the destination (includes destination MAC)
+     * @param destinationIP The destination IP address.
+     * @param visitedIPs A set of previously visited IP addresses
+     * @return List<IP> The IP addresses of the NICs that must be hopped to arrive at the destination (includes destination IP)
      */
-    private List<NIC> findRoute(NIC networkInterface, MAC destinationMAC, Set<MAC> visitedMACs) {
-        // Initial implementation will be an unoptimised breadth-first search for the MAC address
+    private List<NIC> findRoute(NIC networkInterface, IPv4 destinationIP, Set<IPv4> visitedIPs) {
+        // Initial implementation will be an unoptimised breadth-first search for the IP address
         List<NIC> route = new ArrayList<>();
         List<NIC> interfaces = new ArrayList<NIC>();
 
-        System.out.println("Starting route search from MAC ADDRESS: " + networkInterface.getMacAddress());
-        // Check that we are not the destination mac
-        if (networkInterface.getMacAddress().equals(destinationMAC)) {
+        System.out.println("Starting route search from IP ADDRESS: " + networkInterface.getIPv4());
+        // Check that we are not the destination IP
+        if (networkInterface.getIPv4().equals(destinationIP)) {
             System.out.println("Current Device is destination, aborting search...");
             return route;
         }
 
-        if (routingMap.containsKey(destinationMAC)) {
+        if (routingMap.containsKey(destinationIP)) {
             System.out.println("Route already known, using cached result...");
-            // TODO: Loop through each mac address and check if the next step in the route still exists in connect components, if it does not then regenerate the routing map for that mac
-            return routingMap.get(destinationMAC);
+            // TODO: Loop through each IP address and check if the next step in the route still exists in connect components, if it does not then regenerate the routing map for that IP
+            return routingMap.get(destinationIP);
         }
 
         /**
@@ -47,6 +48,7 @@ public class Routing {
          * Otherwise add the NIC to a list of interfaces to search through later
          */
         for (Component c : networkInterface.getConnectingComponents()) {
+            // TODO: Find ways of evaluating if the other components types are connected to NICs, then obtain associated NIC
             // We only want to check other NICs
             if (!(c instanceof NIC)) {
                 System.out.println("Component " + c + " is not a Network Interface, unable to propagate search along this route");
@@ -54,41 +56,43 @@ public class Routing {
             }
 
             NIC connectedInterface = (NIC) c;
-            MAC connectedMAC = connectedInterface.getMacAddress();
+            IPv4 connectedIP = connectedInterface.getIPv4();
             // We've found the destination, add to route and end search
-            if (connectedMAC.equals(destinationMAC)) {
-                System.out.println("Found destination MAC address: " + destinationMAC);
+            if (connectedIP.equals(destinationIP)) {
+                System.out.println("Found destination IP address: " + destinationIP);
                 route.add(connectedInterface);
                 break;
             }
 
-            // Skips any macs we've already visited in other instances of the search
+            // Skips any IPs we've already visited in other instances of the search
             // This prevents us getting stuck in a infinite loop if several NICs are connected to each other in a circle
-            if (visitedMACs.contains(connectedMAC)) {
-                System.out.println("Skipping recognised interface: " + connectedInterface.getMacAddress());
+            if (visitedIPs.contains(connectedIP)) {
+                System.out.println("Skipping recognised interface: " + connectedInterface.getIPv4());
                 continue;
             } else {
                 // We also don't want to search the same
-                if (connectedMAC.equals(networkInterface.getMacAddress())) {
-                    visitedMACs.add(networkInterface.getMacAddress());
+                if (connectedIP.equals(networkInterface.getIPv4())) {
+                    visitedIPs.add(networkInterface.getIPv4());
                     continue;
                 }
 
-                visitedMACs.add(connectedInterface.getMacAddress());
-                System.out.println("Adding MAC address to discovered interfaces: " + connectedInterface.getMacAddress());
+                visitedIPs.add(connectedInterface.getIPv4());
+                System.out.println("Adding IP address to discovered interfaces: " + connectedInterface.getIPv4());
                 interfaces.add(connectedInterface);
             }
         }
 
         // If we didn't find a route on our first search, search connected interfaces
+        // TODO: Change this so instead of searching every connect interface, we only ask the gateway address provided to continue the search
         if (route.size() < 1) {
             for (NIC connectedInterface : interfaces) {
 
-                System.out.println("Attempting to search from connected interface: " + connectedInterface.getMacAddress() + " for MAC address: " + destinationMAC.getMACAddress());
-                List<NIC> subroute = findRoute(connectedInterface, destinationMAC, visitedMACs);
+                System.out.println("Attempting to search from connected interface: " + connectedInterface.getIPv4() + " for IP address: " + destinationIP.getIPAddress(IPType.NORMAL));
+                List<NIC> subroute = findRoute(connectedInterface, destinationIP, visitedIPs);
 
                 // If we find a route, break out early
                 // TODO: Search all routes and take the subroute with the smallest size
+                // This can be achieved by adding all routes to a TreeMap with the size as index, then choosing the element with the smallest key
                 if (subroute.size() > 0) {
                     route.add(connectedInterface);
                     route.addAll(subroute);
@@ -99,9 +103,9 @@ public class Routing {
 
         // If we found a route to the target, we can add it to the routing map
         if (route.size() > 0) {
-            routingMap.put(destinationMAC, route);
+            routingMap.put(destinationIP, route);
         } else {
-            System.out.println("Unable to find target MAC Address");
+            System.out.println("Unable to find target IP Address");
         }
 
         return route;
@@ -110,10 +114,10 @@ public class Routing {
     /**
      * Finds a list of NICs that must be traversed to connect from network interface to destination
      * @param networkInterface The NIC that is the source of the query
-     * @param destinationMAC The destination MAC address.
-     * @return List<MAC> The MAC addresses of the NICs that must be hopped to arrive at the destination (includes destination MAC)
+     * @param destinationIP The destination IP address.
+     * @return List<IP> The IP addresses of the NICs that must be hopped to arrive at the destination (includes destination IP)
      */
-    public List<NIC> findRoute(NIC networkInterface, MAC destinationMAC) {
-        return findRoute(networkInterface, destinationMAC, new HashSet<>());
+    public List<NIC> findRoute(NIC networkInterface, IPv4 destinationIP) {
+        return findRoute(networkInterface, destinationIP, new HashSet<>());
     }
 }

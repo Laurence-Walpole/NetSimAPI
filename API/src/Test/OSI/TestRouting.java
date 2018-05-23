@@ -39,13 +39,15 @@ public class TestRouting {
 
         Routing router = new Routing();
 
-        List<NIC> routeToDestinationMAC = router.findRoute(networkInterface1, destinationInterface.getMacAddress());
+        List<NIC> routeToDestinationMAC = router.findRoute(networkInterface1, destinationInterface.getIPv4());
         Assert.assertEquals(1, routeToDestinationMAC.size());
         printHops(routeToDestinationMAC);
 
-        List<NIC> routeToInterface1 = router.findRoute(destinationInterface, networkInterface1.getMacAddress());
+        List<NIC> routeToInterface1 = router.findRoute(destinationInterface, networkInterface1.getIPv4());
         Assert.assertEquals(1, routeToInterface1.size());
         printHops(routeToInterface1);
+
+        //TODO: Check addresses in list match the result
     }
 
     @Test
@@ -68,13 +70,14 @@ public class TestRouting {
 
         Routing router = new Routing();
 
-        List<NIC> routeToDestinationMAC = router.findRoute(networkInterface1, destinationInterface.getMacAddress());
+        List<NIC> routeToDestinationMAC = router.findRoute(networkInterface1, destinationInterface.getIPv4());
         Assert.assertEquals(2, routeToDestinationMAC.size());
         printHops(routeToDestinationMAC);
 
-        List<NIC> routeToInterface1 = router.findRoute(destinationInterface, networkInterface1.getMacAddress());
+        List<NIC> routeToInterface1 = router.findRoute(destinationInterface, networkInterface1.getIPv4());
         Assert.assertEquals(2, routeToInterface1.size());
         printHops(routeToInterface1);
 
+        //TODO: Check addresses in list match the result
     }
 }
