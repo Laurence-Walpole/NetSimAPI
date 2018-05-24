@@ -2,11 +2,9 @@ package OSI;
 
 import OSI.Physical.Component;
 import OSI.Physical.NIC;
-import OSI.Routing;
 import Standards.MAC;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
